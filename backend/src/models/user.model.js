@@ -11,6 +11,9 @@ export const userSchema = new mongoose.Schema({
     type: String,
   },
   authenticators: [],
+  challenge: {
+    type: String,
+  },
 });
 
 export const Users = mongoose.model('user', userSchema);
