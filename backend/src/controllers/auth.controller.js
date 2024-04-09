@@ -37,17 +37,19 @@ export const generateRegistrationOptions = async (req, res) => {
   }
 };
 
-import mongoose from 'mongoose';
-import { Users } from './userModel'; // Import the user model/schema
-
 export const finaliseRegistration = async (req, res) => {
   try {
     const { credential } = req.body;
-    const { user } = credential; // Assuming credential has a user property
-    const result = await verifyRegistrationResponse({
+    const { user } = credential;
+    const { userId } = req.params;
+    const userRecord = await Users.findOne({ _id: userId });
+    if (!userRecord) {
+      res.status(401).send({ message: 'User not found!' });
+    }
+    await verifyRegistrationResponse({
       response: credential,
-      expectedChallenge: users[user.id].challenge, // Access challenge from stored user data
-      expectedOrigin: 'http://localhost:3000',
+      expectedChallenge: userRecord.challenge,
+      expectedOrigin: 'http://localhost:4001',
       expectedRPID: 'localhost',
     });
 
@@ -62,4 +64,55 @@ export const finaliseRegistration = async (req, res) => {
     console.error('Error finalizing registration:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
+};
+
+export const authenticateUser = async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    const userRecord = await Users.findOne({ _id: userId });
+    if (!userRecord) {
+      res.status(401).send({ message: 'User not found!' });
+    }
+    const username = req.query.username;
+    const options = await generateAuthenticationOptions({
+      rpID: 'localhost',
+      allowCredentials: userRecord.authenticators.map((authenticator) => ({
+        id: authenticator.rawId,
+        type: 'public-key',
+      })),
+      userVerification: 'preferred',
+    });
+
+    // Store the challenge for this user
+    userRecord.challenge = options.challenge;
+
+    res.json(options);
+  } catch (error) {
+    console.error('Error initiating authentication:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+export const finalAuthentication = async (req, res) => {
+  app.post('/authenticate', async (req, res) => {
+    try {
+      const credential = req.body;
+      const userId = req.params.userId;
+      const userRecord = await Users.findOne({ _id: userId });
+      if (!userRecord) {
+        res.status(401).send({ message: 'User not found!' });
+      }
+      await verifyAuthenticationResponse({
+        response: credential,
+        expectedChallenge: userRecord.challenge,
+        expectedOrigin: 'http://localhost:3000',
+        expectedRPID: 'localhost',
+      });
+
+      res.json({ message: 'Authentication successful' });
+    } catch (error) {
+      console.error('Error finalizing authentication:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  });
 };
