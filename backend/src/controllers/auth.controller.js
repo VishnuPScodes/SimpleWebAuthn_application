@@ -111,25 +111,23 @@ export const authenticateUser = async (req, res) => {
 };
 
 export const finalAuthentication = async (req, res) => {
-  app.post('/authenticate', async (req, res) => {
-    try {
-      const credential = req.body;
-      const userId = req.params.userId;
-      const userRecord = await Users.findOne({ _id: userId });
-      if (!userRecord) {
-        res.status(401).send({ message: 'User not found!' });
-      }
-      await verifyAuthenticationResponse({
-        response: credential,
-        expectedChallenge: userRecord.challenge,
-        expectedOrigin: 'http://localhost:3000',
-        expectedRPID: 'localhost',
-      });
-
-      res.json({ message: 'Authentication successful' });
-    } catch (error) {
-      console.error('Error finalizing authentication:', error);
-      res.status(500).json({ error: 'Internal server error' });
+  try {
+    const credential = req.body;
+    const userId = req.params.userId;
+    const userRecord = await Users.findOne({ _id: userId });
+    if (!userRecord) {
+      res.status(401).send({ message: 'User not found!' });
     }
-  });
+    await verifyAuthenticationResponse({
+      response: credential,
+      expectedChallenge: userRecord.challenge,
+      expectedOrigin: 'http://localhost:4001',
+      expectedRPID: 'localhost',
+    });
+
+    res.json({ message: 'Authentication successful' });
+  } catch (error) {
+    console.error('Error finalizing authentication:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
 };
