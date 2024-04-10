@@ -6,7 +6,7 @@ import {
   verifyAuthenticationResponse,
 } from '@simplewebauthn/server';
 
-export const generateRegistrationOptions = async (req, res) => {
+export const generateRegistrationOption = async (req, res) => {
   const { userId } = req.body;
   try {
     const user = await Users.findOne({ _id: userId });

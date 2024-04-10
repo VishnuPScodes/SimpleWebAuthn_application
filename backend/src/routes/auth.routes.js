@@ -2,12 +2,12 @@ import express from 'express';
 import {
   authenticateUser,
   finaliseRegistration,
-  userRegistration,
+  generateRegistrationOption,
 } from '../controllers/auth.controller.js';
 
 const authRouter = express.Router();
 
-authRouter.get('/register', userRegistration);
+authRouter.get('/register', generateRegistrationOption);
 authRouter.get('/register/:userId', finaliseRegistration);
 authRouter.get('/authenticate/:userId', authenticateUser);
 export default authRouter;

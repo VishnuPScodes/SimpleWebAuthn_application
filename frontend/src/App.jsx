@@ -6,13 +6,13 @@ import AuthenticateUser from './components/AuthenticateUser';
 import FinalizeRegistration from './components/FinalizeRegistration';
 import UserRegistration from './components/UserRegistration';
 //  import AuthenticateUser from './components/AuthenticateUser';
-
+import './app.css';
 const App = () => {
   return (
     <Router>
       <div>
         <Routes>
-          <Route path="/register" element={<UserRegistration />} />
+          <Route path="/" element={<UserRegistration />} />
           <Route
             path="/finalize-registration/:userId"
             element={<FinalizeRegistration />}
