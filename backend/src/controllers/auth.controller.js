@@ -25,13 +25,12 @@ export const registerUserToThePlatform = async (req, res) => {
 };
 
 export const generateRegistrationOption = async (req, res) => {
-  const userId = '66168dd34e13613427e0b249'; //hardcoding the userId just for now
   try {
-    const user = await Users.findOne({ _id: userId });
+    const username = req.query.username;
+    const user = await Users.findOne({ username });
     if (!user) {
       return res.status(404).json({ message: 'User not found!' });
     }
-    const username = user.username;
     const options = await generateRegistrationOptions({
       rpName: 'Your RP Name',
       rpID: 'localhost',
