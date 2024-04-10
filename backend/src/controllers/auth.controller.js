@@ -6,8 +6,26 @@ import {
   verifyAuthenticationResponse,
 } from '@simplewebauthn/server';
 
+export const registerUserToThePlatform = async (req, res) => {
+  const { username, email } = req.body;
+  try {
+    let userData = await Users.findOne({ email: email });
+    if (userData) {
+      res
+        .status(400)
+        .send({ status: 'failed', message: 'user already exists' });
+    } else {
+      userData = await Users.create({ username, email });
+      res.status(200).send({ userData });
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(400).send(error);
+  }
+};
+
 export const generateRegistrationOption = async (req, res) => {
-  const { userId } = req.body;
+  const userId = '66168dd34e13613427e0b249'; //hardcoding the userId just for now
   try {
     const user = await Users.findOne({ _id: userId });
     if (!user) {
@@ -41,7 +59,7 @@ export const finaliseRegistration = async (req, res) => {
   try {
     const { credential } = req.body;
     const { user } = credential;
-    const { userId } = req.params;
+    const userId = '66168dd34e13613427e0b249';
     const userRecord = await Users.findOne({ _id: userId });
     if (!userRecord) {
       res.status(401).send({ message: 'User not found!' });
@@ -83,7 +101,6 @@ export const authenticateUser = async (req, res) => {
       userVerification: 'preferred',
     });
 
-    // Store the challenge for this user
     userRecord.challenge = options.challenge;
 
     res.json(options);
