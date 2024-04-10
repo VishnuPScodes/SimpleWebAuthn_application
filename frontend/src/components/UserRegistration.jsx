@@ -1,15 +1,16 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-
+import { useNavigate } from 'react-router-dom';
 const UserRegistration = () => {
   const [username, setUsername] = useState('');
-
+  const navigate = useNavigate();
   const handleRegistration = async () => {
     try {
       const response = await axios.get(
-        `https://localhost:4001/authn/register?username=${username}`
+        `http://localhost:4001/authn/register?username=${username}`
       );
       console.log(response.data);
+      navigate('/finalize-registration');
     } catch (error) {
       console.error('Error during registration:', error);
     }

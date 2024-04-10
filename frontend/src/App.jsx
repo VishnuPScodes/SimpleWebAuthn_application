@@ -14,7 +14,7 @@ const App = () => {
         <Routes>
           <Route path="/" element={<UserRegistration />} />
           <Route
-            path="/finalize-registration/:userId"
+            path="/finalize-registration"
             element={<FinalizeRegistration />}
           />
           <Route path="/authenticate/:userId" element={<AuthenticateUser />} />

@@ -57,12 +57,12 @@ export const generateRegistrationOption = async (req, res) => {
 export const finaliseRegistration = async (req, res) => {
   try {
     const { credential } = req.body;
-    const { user } = credential;
     const userId = '66168dd34e13613427e0b249';
     const userRecord = await Users.findOne({ _id: userId });
     if (!userRecord) {
       res.status(401).send({ message: 'User not found!' });
     }
+    console.log('1');
     await verifyRegistrationResponse({
       response: credential,
       expectedChallenge: userRecord.challenge,
@@ -71,7 +71,7 @@ export const finaliseRegistration = async (req, res) => {
     });
 
     const updatedUser = await Users.findByIdAndUpdate(
-      user.id,
+      userRecord._id,
       { $push: { authenticators: credential } },
       { new: true }
     );
